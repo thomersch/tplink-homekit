@@ -97,6 +97,8 @@ func (d *device) do(cmd []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer conn.Close()
+
 	_, err = conn.Write(encrypt(cmd))
 	if err != nil {
 		return nil, err
@@ -152,6 +154,7 @@ func main() {
 		d := device{Addr: dev + ":9999"}
 		err := d.Init()
 		if err != nil {
+			log.Printf("Could not connect to %s: %v", dev, err)
 			continue
 		}
 		accs = append(accs, d.Announce())
