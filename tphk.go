@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -61,8 +62,19 @@ func (d *device) info() error {
 	return nil
 }
 
+func (d *device) HKDevID() uint64 {
+	o := make([]byte, hex.DecodedLen(len(d.DevID)))
+	_, err := hex.Decode(o, []byte(d.DevID))
+	if err != nil {
+		return 0
+	}
+	return binary.LittleEndian.Uint64(o)
+}
+
 func (d *device) Announce() *accessory.Accessory {
+	log.Println(d.HKDevID())
 	i := accessory.Info{
+		ID:           d.HKDevID(),
 		Name:         d.Alias,
 		SerialNumber: d.DevID,
 		Manufacturer: "TP-Link",
